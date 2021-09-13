@@ -1,18 +1,23 @@
-# What is Ansible?
+- What is Ansible?<br>
 Ansible is a software tool that provides simple but powerful automation for cross-platform computer support. It is primarily intended for IT professionals, who use it for application deployment, updates on workstations and servers, cloud provisioning, configuration management, intra-service orchestration, and much more.
 
-# What is Infrastructure as Code (IaC)?
+- What is Infrastructure as Code (IaC)?<br>
 Infrastructure as Code (IaC) is a combination of standards, practices, tools, and processes to provision, configure, and manage computer infrastructure using code and other machine-readable files.
+- What is Ansible and what are the benefits of it?
+- Why should we use Ansible?
+- Diagram for on-prem, hybrid and public architectire
+- Default directory structure for Ansible
+- What is the inventory/hosts filie and the purpose of each?
+- What should be added to hosts file to establish secure connection between Ansible controller and agent nodes?
+- What are Ansible ad-hoc commands?
+- Structure of ad-hoc commands
 # Ansible controller and agent nodes set up guide
 ![](img/diagram1.png)
 
 - Clone this repo and run `vagrant up`
 - `(double check syntax/intendation)`
 
-## We will use 18.04 ubuntu for ansible controller and agent nodes set up 
-### Please ensure to refer back to your vagrant documentation
-
-- **You may need to reinstall plugins or dependencies required depending on the OS you are using.**
+### Vagrantfile code:
 
 ```vagrant 
 # -*- mode: ruby -*-
@@ -87,7 +92,7 @@ Check if it is installed: `ansible --version`
 
 ## Set up SSH passwords
 - Run SSH from the controller machine into each machine: `ssh vagrant@IP`<br>
-- Enter a password
+- Enter a password (vagrant)
 
 ## Add these into `/etc/ansible/hosts`:
 
@@ -100,3 +105,28 @@ Check if it is installed: `ansible --version`
 ```
 ### Check if they connect:
 `ansible all -m ping`
+
+### Run any shell command like this:
+`ansible all -a "command"`<br>
+*Note: you can replace 'all' with a machine name*
+
+## Ansible Playbooks
+- Ansible playbooks are a completely different way to use Ansible than ad-hoc task execution
+- Ansible playbooks are .yml or .yaml files written in YAML (Yet Another Markup Language)
+- Playbooks start with 3 dashes `---` 
+- Example playbook (`nginx_playbook.yml`):
+```
+# Playbook for [web]
+---
+- hosts: web # name of the host
+  gather_facts: yes  # gather facts about the installation steps
+  become: true # admin access
+
+  # instructions to install nginx:
+  tasks:
+  - name: Install Nginx
+    apt: pkg=nginx state=present
+
+```
+- Run playbook: `ansible-playbook nginx_playbook.yml`
+- Check if it worked with and ad-hoc command: `ansible web -a "sudo systemctl status nginx"`
