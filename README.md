@@ -75,3 +75,28 @@ end
 - SSH into each of them: `vagrant ssh "machine name"`
 - Run `sudo apt-get update -y` and `sudo apt-get upgrade -y`
 - Check their connection by tying to `ping` **web** and **db** machines from the **controller** machine
+
+## Install Ansible on controller machine
+Install dependencies first:
+- `sudo apt-get install software-properties-common -y`
+- `sudo apt-add-repository ppa:ansible/ansible`
+
+Run update again: `sudo apt-get update -y` <br>
+Install Ansible: `sudo apt-get install ansible -y`<br>
+Check if it is installed: `ansible --version`
+
+## Set up SSH passwords
+- Run SSH from the controller machine into each machine: `ssh vagrant@IP`<br>
+- Enter a password
+
+## Add these into `/etc/ansible/hosts`:
+
+```
+[web]
+192.168.33.10 ansible_connection=ssh ansible_user=vagrant ansible_ssh_pass=vagrant
+
+[db]
+192.168.33.11 ansible_connection=ssh ansible_user=vagrant ansible_ssh_pass=vagrant
+```
+### Check if they connect:
+`ansible all -m ping`
