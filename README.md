@@ -1,4 +1,4 @@
-
+![](img/diagram1.png)
 # Ansible controller and agent nodes set up guide
 - Clone this repo and run `vagrant up`
 - `(double check syntax/intendation)`
@@ -64,4 +64,3 @@ Vagrant.configure("2") do |config|
 
 end
 ```
-# sre_iac_ansible
