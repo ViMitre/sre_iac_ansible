@@ -144,7 +144,6 @@ Check if it is installed: `ansible --version`
       dest: /home/vagrant/
 ```
 ### Install NodeJS
-Playbook:
 ```
 ---
 - hosts: web
