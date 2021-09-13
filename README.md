@@ -1,5 +1,11 @@
-![](img/diagram1.png)
+# What is Ansible?
+Ansible is a software tool that provides simple but powerful automation for cross-platform computer support. It is primarily intended for IT professionals, who use it for application deployment, updates on workstations and servers, cloud provisioning, configuration management, intra-service orchestration, and much more.
+
+# What is Infrastructure as Code (IaC)?
+Infrastructure as Code (IaC) is a combination of standards, practices, tools, and processes to provision, configure, and manage computer infrastructure using code and other machine-readable files.
 # Ansible controller and agent nodes set up guide
+![](img/diagram1.png)
+
 - Clone this repo and run `vagrant up`
 - `(double check syntax/intendation)`
 
@@ -64,3 +70,8 @@ Vagrant.configure("2") do |config|
 
 end
 ```
+### After running `vagrant up`, make sure all the vm-s are working and up to date:
+- `vagrant status`
+- SSH into each of them: `vagrant ssh "machine name"`
+- Run `sudo apt-get update` -y and `sudo apt-get upgrade -y`
+- Check their connection by tying to `ping` **web** and **db** machines from the **controller** machine
