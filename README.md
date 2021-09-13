@@ -73,5 +73,5 @@ end
 ### After running `vagrant up`, make sure all the vm-s are working and up to date:
 - `vagrant status`
 - SSH into each of them: `vagrant ssh "machine name"`
-- Run `sudo apt-get update` -y and `sudo apt-get upgrade -y`
+- Run `sudo apt-get update -y` and `sudo apt-get upgrade -y`
 - Check their connection by tying to `ping` **web** and **db** machines from the **controller** machine
