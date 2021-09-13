@@ -114,7 +114,8 @@ Check if it is installed: `ansible --version`
 - Ansible playbooks are a completely different way to use Ansible than ad-hoc task execution
 - Ansible playbooks are .yml or .yaml files written in YAML (Yet Another Markup Language)
 - Playbooks start with 3 dashes `---` 
-- Example playbook (`nginx_playbook.yml`):
+
+### Install Nginx
 ```
 # Playbook for [web]
 ---
@@ -130,3 +131,97 @@ Check if it is installed: `ansible --version`
 ```
 - Run playbook: `ansible-playbook nginx_playbook.yml`
 - Check if it worked with and ad-hoc command: `ansible web -a "sudo systemctl status nginx"`
+### Copy App from controller to web
+```
+---
+- hosts: web
+  become: true
+
+  tasks:
+  - name: Copy app
+    ansible.builtin.copy:
+      src: /home/vagrant/app
+      dest: /home/vagrant/
+```
+### Install NodeJS
+Playbook:
+```
+---
+- hosts: web
+  gather_facts: yes
+  become: true
+
+  tasks:
+  - name: Install NodeJS
+    shell: |
+      curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash - && sudo apt-get install -y nodejs
+      cd /home/vagrant/app
+      sudo npm install pm2 -g -y
+      sudo npm install
+```
+### Install MongoDB
+```
+---
+- hosts: db
+  gather_facts: yes
+  become: true
+
+  tasks:
+  - name: Install MongoDB
+    shell: |
+      wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+      echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+      sudo apt-get update -y
+      sudo apt-get install -y mongodb-org
+      sudo systemctl start mongod
+      sudo systemctl enable mongod
+```
+### Change nginx config and restart
+```
+---
+- hosts: web
+  become: true
+
+  tasks:
+  - name: Copy nginx config file
+    ansible.builtin.copy:
+      src: /home/vagrant/config_files/default
+      dest: /etc/nginx/sites-available/default
+
+  - name: Restart nginx
+    shell: |
+        systemctl restart nginx
+```
+### Change mongod config and restart
+```
+---
+- hosts: db
+  become: true
+
+  tasks:
+  - name: Copy mongod.conf
+    ansible.builtin.copy:
+      src: /home/vagrant/config_files/mongod.conf
+      dest: /etc/mongod.conf
+  - name: Restart mongo
+    shell: |
+      sudo systemctl restart mongod
+```
+
+### Start the app
+```
+---
+- hosts: web
+  gather_facts: yes
+  become: true
+
+  tasks:
+  - name: Start app
+    environment:
+      DB_HOST: mongodb://192.168.33.11:27017/posts
+    shell: |
+      cd /home/vagrant/app
+      node seeds/seed.js
+      pm2 kill
+      pm2 start app.js
+```
