@@ -1,17 +1,38 @@
-- What is Ansible?<br>
-Ansible is a software tool that provides simple but powerful automation for cross-platform computer support. It is primarily intended for IT professionals, who use it for application deployment, updates on workstations and servers, cloud provisioning, configuration management, intra-service orchestration, and much more.
+### **What is Ansible?**
+Ansible is a software tool that provides simple but powerful automation for cross-platform computer support. It is primarily intended for IT professionals, who use it for application deployment, updates on workstations and servers, cloud provisioning, configuration management, intra-service orchestration, and much more.<br>
+**Benefits of Ansible**:
+- Free: Ansible is an open-source tool.
+- Very simple to set up and use: No special coding skills are necessary to use Ansible’s playbooks (more on playbooks later).
+- Powerful: Ansible lets you model even highly complex IT workflows. 
+- Flexible: You can orchestrate the entire application environment no matter where it’s deployed. You can also customize it based on your needs.
+- Agentless: You don’t need to install any other software or firewall ports on the client systems you want to automate. You also don’t have to set up a separate management structure.
+- Efficient: Because you don’t need to install any extra software, there’s more room for application resources on your server.
 
-- What is Infrastructure as Code (IaC)?<br>
+### **What is Infrastructure as Code (IaC)?**<br>
 Infrastructure as Code (IaC) is a combination of standards, practices, tools, and processes to provision, configure, and manage computer infrastructure using code and other machine-readable files.
-- What is Ansible and what are the benefits of it?
-- Why should we use Ansible?
-- Diagram for on-prem, hybrid and public architectire
-- Default directory structure for Ansible
-- What is the inventory/hosts filie and the purpose of each?
-- What should be added to hosts file to establish secure connection between Ansible controller and agent nodes?
-- What are Ansible ad-hoc commands?
-- Structure of ad-hoc commands
-# Ansible controller and agent nodes set up guide
+
+### **Why should we use Ansible?**
+It can automate processes such as configuration management, application deployment, intraservice orchestration, and provisioning on many machines at the same time.
+
+### **Default directory structure for Ansible**
+```
+/etc/ansible/
+             ansible.cfg  
+             hosts            
+             roles/           
+```
+### **Inventory/hosts file**
+The Ansible inventory file defines the hosts and groups of hosts upon which commands, modules, and tasks in a playbook operate. The file can be in one of many formats depending on your Ansible environment and plugins. Common formats include INI and YAML. The default location for the inventory file is /etc/ansible/hosts.
+### **What should be added to hosts file to establish secure connection between Ansible controller and agent nodes?**
+The connection type, username and password.
+Example:<br>
+`(IP) ansible_connection=ssh ansible_user=vagrant ansible_ssh_pass=vagrant`
+### **What are Ansible ad-hoc commands?**
+Commands that can be executed on any and any number of agent nodes simultaneously.
+### **Structure of ad-hoc commands**
+Starts with 'ansible', followed by the target agent, then the module and module options. In case of *shell*, these would be the commands.<br>
+Example: `ansible all -m shell -a "pwd"`<br>
+# **Ansible controller and agent nodes set up guide**
 ![](img/diagram1.png)
 
 - Clone this repo and run `vagrant up`
@@ -144,7 +165,6 @@ Check if it is installed: `ansible --version`
       dest: /home/vagrant/
 ```
 ### Install NodeJS
-Playbook:
 ```
 ---
 - hosts: web
@@ -154,7 +174,8 @@ Playbook:
   tasks:
   - name: Install NodeJS
     shell: |
-      curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash - && sudo apt-get install -y nodejs
+      curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+      sudo apt-get install -y nodejs
       cd /home/vagrant/app
       sudo npm install pm2 -g -y
       sudo npm install
