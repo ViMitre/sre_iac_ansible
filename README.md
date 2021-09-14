@@ -272,3 +272,36 @@ Check if it is installed: `ansible --version`
       DB_HOST: mongodb://192.168.33.11:27017/posts
 
 ```
+
+# Hybrid Infrastructure
+
+## Install dependencies
+- Python 3
+- Boto3
+- pip3
+### Run this script to install dependencies:
+```
+!#/bin/bash
+sudo apt update -y
+sudo apt-get install tree -y
+sudo apt-add-repository --yes --update ppa:ansible/ansible
+sudo apt install ansible -y
+sudo apt install python3-pip
+pip3 install awscli
+pip3 install boto boto3
+sudo apt-get upgrade -y
+```
+Make Python 3 the default version: `alias python=python3`<br>
+Make it permanent: `echo "alias python=python3" >> ~/.bashrc`
+## Set up Ansible vault to secure AWS keys
+- Create this directory structure in `/etc/ansible`: `group_vars/all`
+- In `all` directory, run: `sudo ansible-vault create pass.yml`
+- Enter a password
+- Once in editing mode, add the following lines:
+```
+aws_access_key: (your access key)
+aws_secret_key: (your secret key)
+```
+## Copy the .pem key to the controller machine
+## Generate a new key in `~/.ssh` in the controller
+`ssh-keygen -t rsa -b 4096 -C "your_email@example.com"`
