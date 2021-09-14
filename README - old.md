@@ -164,111 +164,85 @@ Check if it is installed: `ansible --version`
       src: /home/vagrant/app
       dest: /home/vagrant/
 ```
-### MongoDB
+### Install NodeJS
 ```
-#mongodb.yml
-# This is a YAML file to install nginx onto oue web VM using YAML
 ---
+- hosts: web
+  gather_facts: yes
+  become: true
 
+  tasks:
+  - name: Install NodeJS
+    shell: |
+      curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+      sudo apt-get install -y nodejs
+      cd /home/vagrant/app
+      sudo npm install pm2 -g -y
+      sudo npm install
+```
+### Install MongoDB
+```
+---
 - hosts: db
-
   gather_facts: yes
-
   become: true
 
   tasks:
-  - name: install mongodb
-    apt: pkg=mongodb state=present
-
-  - name: Remove mongodb file (delete file)
-    file:
-      path: /etc/mongodb.conf
-      state: absent
-
-  - name: Touch a file, using symbolic modes to set the permissions (equivalent to 0644)
-    file:
-      path: /etc/mongodb.conf
-      state: touch
-      mode: u=rw,g=r,o=r
-
-
-  - name: Insert multiple lines and Backup
-    blockinfile:
-      path: /etc/mongodb.conf
-      backup: yes
-      block: |
-        "storage:
-          dbPath: /var/lib/mongodb
-          journal:
-            enabled: true
-        systemLog:
-          destination: file
-          logAppend: true
-          path: /var/log/mongodb/mongod.log
-        net:
-          port: 27017
-          bindIp: 0.0.0.0"
-
+  - name: Install MongoDB
+    shell: |
+      wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+      echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+      sudo apt-get update -y
+      sudo apt-get install -y mongodb-org
+      sudo systemctl start mongod
+      sudo systemctl enable mongod
 ```
-### NginX
+### Change nginx config and restart
 ```
-# Create a playbook to install nginx web server on web machine
-# web 192.168.33.10
-# Let's add the 3 dashes to start the YAML 
---- 
-# add the name of the host
+---
 - hosts: web
-
-# gather facts about the installation steps 
-  gather_facts: yes
-
-# we need admin access
-  become: true 
-    
-# add instruction to install nignx on web machine
-  tasks:
-  - name: Install Nginx
-    apt: pkg=nginx state=present
-   
-# ensure the nginx server is running
-```
-### NodeJS
-```
-# Install node js and NPM
-
-- hosts: web
-  gather_facts: true
   become: true
 
+  tasks:
+  - name: Copy nginx config file
+    ansible.builtin.copy:
+      src: /home/vagrant/config_files/default
+      dest: /etc/nginx/sites-available/default
 
+  - name: Restart nginx
+    shell: |
+        systemctl restart nginx
+```
+### Change mongod config and restart
+```
+---
+- hosts: db
+  become: true
 
   tasks:
-  - name: Install nodejs
-    apt: pkg=nodejs state=present
-
-  - name: Install NPM
-    apt: pkg=npm state=present
-
-  - name: download latest npm + Mongoose
+  - name: Copy mongod.conf
+    ansible.builtin.copy:
+      src: /home/vagrant/config_files/mongod.conf
+      dest: /etc/mongod.conf
+  - name: Restart mongo
     shell: |
-      npm install -g npm@latest
-      npm install mongoose -y
-# Downloading pm2
-  - name: Install pm2
-    npm:
-      name: pm2
-      global: yes
+      sudo systemctl restart mongod
+```
 
+### Start the app
+```
+---
+- hosts: web
+  gather_facts: yes
+  become: true
 
-  - name: seed + run app
+  tasks:
+  - name: Start app
+    environment:
+      DB_HOST: mongodb://192.168.33.11:27017/posts
     shell: |
-      cd app/
-      npm install
-  #node seeds/seed.js
+      cd /home/vagrant/app
+      node seeds/seed.js
       pm2 kill
       pm2 start app.js
-    environment:
-# This is where you enter the environment variable to tell the app where to look for the db
-      DB_HOST: mongodb://192.168.33.11:27017/posts
-
 ```

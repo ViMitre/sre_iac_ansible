@@ -1,0 +1,19 @@
+# Create a playbook to install nginx web server on web machine
+# web 192.168.33.10
+# Let's add the 3 dashes to start the YAML 
+--- 
+# add the name of the host
+- hosts: web
+
+# gather facts about the installation steps 
+  gather_facts: yes
+
+# we need admin access
+  become: true 
+    
+# add instruction to install nignx on web machine
+  tasks:
+  - name: Install Nginx
+    apt: pkg=nginx state=present
+   
+# ensure the nginx server is running
