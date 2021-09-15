@@ -1,0 +1,16 @@
+---
+- hosts: web
+  gather_facts: yes
+  become: true
+
+  tasks:
+  - name: Install NodeJS
+    shell: |
+      curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash - && sudo apt-get install -y nodejs
+      cd /home/vagrant/app
+      sudo npm install pm2 -g -y
+      sudo npm install
+      
+  - name: Start app Playbook
+    import_playbook: npm_start.yml
+

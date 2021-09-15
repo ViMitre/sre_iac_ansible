@@ -1,0 +1,50 @@
+---
+- hosts: db
+  gather_facts: yes
+  become: true
+
+  tasks:
+  - name: Install MongoDB
+    apt: pkg=mongodb state = present
+
+  - name: Remove mongodb config file
+    file: 
+      path: /etc/mongod.conf
+      state: absent
+
+  - name: Create a file, set its permissions equivalent to 0644
+    file:
+      path: /etc/mongod.conf
+      state: touch
+      mode: u=rw, g=r, o=r
+
+  - name: Insert lines and backup
+    blockinfile:
+      path: /etc/mongod.conf
+      backup: yes
+      block: |
+        # mongodb.conf
+          storage:
+            dbPath: /var/lib/mongodb
+            journal:
+              enabled: true
+          systemLog:
+            destination: file
+            logAppend: true
+            path: /var/log/mongodb/mongod.log
+          net:
+            port: 27017
+            bindIp: 0.0.0.0
+  - name: Restart mongodb
+    become: true
+    shell: systemctl restart mongodb
+
+  - name: enable mongodb
+    become: true
+    shell: systemctl enable mongodb
+
+  - name: start mongodb
+    become: true
+    shell: systemctl start mongodb
+
+   

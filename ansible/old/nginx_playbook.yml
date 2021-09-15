@@ -1,0 +1,14 @@
+# Playbook for [web]
+---
+- hosts: web # name of the host
+  gather_facts: yes  # gather facts about the installation steps
+  become: true # admin access
+
+  # instructions to install nginx:
+  tasks:
+  - name: Install Nginx
+    apt: pkg=nginx state=present
+    
+  - name: Running Playbook
+    import_playbook: copy_nginx_config.yml
+

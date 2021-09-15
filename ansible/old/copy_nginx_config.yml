@@ -1,0 +1,17 @@
+---
+- hosts: web
+  become: true
+
+  tasks:
+  - name: Copy nginx config file
+    ansible.builtin.copy:
+      src: /home/vagrant/config_files/default
+      dest: /etc/nginx/sites-available/default
+
+  - name: Restart nginx
+    shell: |
+        systemctl restart nginx
+      
+  - name: Running Playbook
+    import_playbook: copy_app.yml
+

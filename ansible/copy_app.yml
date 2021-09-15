@@ -1,0 +1,13 @@
+---
+- hosts: web
+  become: true
+
+  tasks:
+  - name: Copy app
+    ansible.builtin.copy:
+      src: /home/vagrant/app
+      dest: /home/vagrant/
+
+  - name: Running Playbook
+    import_playbook: nodejs_playbook.yml
+

@@ -1,0 +1,16 @@
+---
+- hosts: db
+  become: true
+
+  tasks:
+  - name: Copy mongod.conf
+    ansible.builtin.copy:
+      src: /home/vagrant/config_files/mongod.conf
+      dest: /etc/mongod.conf
+  - name: Restart mongo
+    shell: |
+      sudo systemctl restart mongod
+
+  - name: Running Nginx Playbook
+    import_playbook: nginx_playbook.yml
+

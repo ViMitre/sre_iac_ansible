@@ -136,6 +136,18 @@ Check if it is installed: `ansible --version`
 - Ansible playbooks are .yml or .yaml files written in YAML (Yet Another Markup Language)
 - Playbooks start with 3 dashes `---` 
 
+### Copy App from controller to web
+```
+---
+- hosts: web
+  become: true
+
+  tasks:
+  - name: Copy app
+    ansible.builtin.copy:
+      src: /home/vagrant/app
+      dest: /home/vagrant/
+```
 ### Install Nginx
 ```
 # Playbook for [web]
@@ -152,18 +164,7 @@ Check if it is installed: `ansible --version`
 ```
 - Run playbook: `ansible-playbook nginx_playbook.yml`
 - Check if it worked with and ad-hoc command: `ansible web -a "sudo systemctl status nginx"`
-### Copy App from controller to web
-```
----
-- hosts: web
-  become: true
 
-  tasks:
-  - name: Copy app
-    ansible.builtin.copy:
-      src: /home/vagrant/app
-      dest: /home/vagrant/
-```
 ### MongoDB
 ```
 #mongodb.yml
@@ -283,10 +284,10 @@ Check if it is installed: `ansible --version`
 ```
 !#/bin/bash
 sudo apt update -y
-sudo apt-get install tree -y
+sudo apt install tree -y
 sudo apt-add-repository --yes --update ppa:ansible/ansible
 sudo apt install ansible -y
-sudo apt install python3-pip
+sudo apt install python3-pip -y
 pip3 install awscli
 pip3 install boto boto3
 sudo apt-get upgrade -y
@@ -302,6 +303,23 @@ Make it permanent: `echo "alias python=python3" >> ~/.bashrc`
 aws_access_key: (your access key)
 aws_secret_key: (your secret key)
 ```
+Give read permissions to `pass.yml`: `sudo chmod 644 pass.yml`<br>
+`ansible db -m ping --ask-vault-pass`
 ## Copy the .pem key to the controller machine
 ## Generate a new key in `~/.ssh` in the controller
 `ssh-keygen -t rsa -b 4096 -C "your_email@example.com"`
+
+## Launch an EC2 instance on AWS using Ansible
+### Create a playbook
+
+- ID of the AMI: `ami-0943382e114f188e8`<br>
+- Type of instance: t2.micro
+- VPC:
+- Subnet:
+- Security group:
+- Key:
+- Public IP:
+
+
+
+`ec2_create.yml`:

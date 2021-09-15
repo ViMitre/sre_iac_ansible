@@ -1,0 +1,14 @@
+---
+- hosts: web
+  gather_facts: yes
+  become: true
+
+  tasks:
+  - name: Start app
+    environment:
+      DB_HOST: mongodb://192.168.33.11:27017/posts
+    shell: |
+      cd /home/vagrant/app
+      node seeds/seed.js
+      pm2 kill
+      pm2 start app.js
